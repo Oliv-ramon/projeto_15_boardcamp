@@ -1,4 +1,4 @@
-import categorySchema from "./categoryShema"
+import categorySchema from "./categoryShema.js"
 
 export {
   categorySchema,
