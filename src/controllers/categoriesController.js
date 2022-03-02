@@ -1,6 +1,6 @@
 import connection from "../db.js";
 
-export default async function createCategory(req, res) {
+export async function createCategory(req, res) {
   const category = req.body;
 
   try {
@@ -11,6 +11,20 @@ export default async function createCategory(req, res) {
     console.log(query);
     
     return res.sendStatus(201);
+  } catch {
+    res.sendStatus(500);
+  }
+}
+
+export async function getCategories(_req, res) {
+  try {
+    const query =  await connection.query(`
+      SELECT * FROM categories`);
+
+    const categories = query.rows;
+    console.log(query);
+    
+    return res.status(200).send(categories);
   } catch {
     res.sendStatus(500);
   }
