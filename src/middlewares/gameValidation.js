@@ -10,8 +10,8 @@ export default async function gameValidation(req, res, next) {
     
     const validation = gameSchema.validate(game);
     const secondaryValidation = 
-      Number(game.stockTotal) < 0 ||
-      Number(game.pricePerDay) < 0 ||
+      Number(game.stockTotal) <= 0 ||
+      Number(game.pricePerDay) <= 0 ||
       !validsCategoriesIds.some(({ id }) => id === game.categoryId);
 
     if (validation.error || secondaryValidation) {

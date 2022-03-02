@@ -14,16 +14,16 @@ export async function createGame(req, res) {
   } catch {
     res.sendStatus(500);
   }
-}
+}   
 
 export async function getGames(_req, res) {
   try {
     const query =  await connection.query(`
-      SELECT * FROM categories`);
+      SELECT * FROM games`);
 
-    const categories = query.rows;
+    const games = query.rows;
     
-    return res.status(200).send(categories);
+    return res.status(200).send(games);
   } catch {
     res.sendStatus(500);
   }
