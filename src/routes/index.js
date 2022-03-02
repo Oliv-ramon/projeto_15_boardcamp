@@ -1,8 +1,8 @@
 import { Router } from "express";
-import testRoute from "./testRoute.js";
+import categoriesRoute from "./categoriesRoute.js";
 
 const routes = Router();
 
-routes.use(testRoute);
+routes.use(categoriesRoute);
 
 export default routes;
