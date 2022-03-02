@@ -1,10 +1,10 @@
 import { Router } from "express";
 import { gameValidation } from "../middlewares/index.js"
-import { getGames, createGame } from "../controllers/categoriesController.js";
+import { getGames, createGame } from "../controllers/gamesController.js";
 
 const gamesRoute = Router();
 
-gamesRoute.get("/categories", getGames);
-gamesRoute.post("/categories", gameValidation, createGame);
+gamesRoute.get("/games", getGames);
+gamesRoute.post("/games", gameValidation, createGame);
 
 export default gamesRoute;
