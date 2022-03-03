@@ -12,9 +12,26 @@ export async function createCustomer(req, res) {
   } catch {
     res.sendStatus(500);
   }
-
-  res.sendStatus(200)
 }   
+
+export async function updateCustomer(req, res) {
+  const customer = req.body;
+
+  try {
+    await connection.query(`
+      UPDATE customers SET 
+        name = $1,
+        phone = $2,
+        cpf = $3,
+        birthday = $4
+      WHERE id = $5
+    `, [...Object.values(customer), req.params.id]);
+    
+    return res.sendStatus(200);
+  } catch {
+    res.sendStatus(500);
+  }
+}  
 
 export async function getCustomers(_req, res) {
   try {
@@ -27,7 +44,6 @@ export async function getCustomers(_req, res) {
   } catch {
     res.sendStatus(500);
   }
-  res.sendStatus(200)
 }
 
 export async function getCustomerById(req, res) {
@@ -47,5 +63,4 @@ export async function getCustomerById(req, res) {
   } catch {
     res.sendStatus(500);
   }
-  res.sendStatus(200)
 }
