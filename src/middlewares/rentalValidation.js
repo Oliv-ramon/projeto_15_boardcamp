@@ -36,6 +36,8 @@ export default async function rentalValidation(req, res, next) {
       return res.status(400).send("insufficient games on stock");
     }
 
+    res.locals.game = game;
+    res.locals.rental = rental;
   } catch (error) {
     console.log(error)
     return res.sendStatus(500);
