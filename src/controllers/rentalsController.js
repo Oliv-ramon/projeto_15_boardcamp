@@ -33,11 +33,10 @@ export async function getRentals(req, res) {
   
   let filter = "";
   if (customerId) {
-    filter = `WHERE "customerId" = ${customerId}`
+    filter = `WHERE "customerId" = ${customerId}`;
   }
   if (gameId) {
-    filter = `WHERE "gameId" = ${gameId}`
-    console.log(filter)
+    filter = `WHERE "gameId" = ${gameId}`;
   }
 
   try {
@@ -74,6 +73,35 @@ export async function getRentals(req, res) {
     });
   
     return res.status(200).send(rentals);
+  } catch {
+    res.sendStatus(500);
+  }
+}
+
+export async function finishRental(_req, res) {
+  const { rental, rentalId } = res.locals;
+
+  try {
+    const rentDate = rental.rentDate;
+    const returnDate = new Date();
+
+    const gameResult = await connection.query(`
+      SELECT * FROM games
+      WHERE id = $1
+    `, [rental.gameId]);  
+
+    const { pricePerDay } = gameResult.rows[0];
+
+    const delayDays = parseInt((returnDate.getTime() - rentDate.getTime())/(1000*60*60*24));
+    const delayFee = pricePerDay * delayDays;
+    
+    await connection.query(`
+      UPDATE rentals 
+      SET "returnDate" = $2, "delayFee" = $3
+      WHERE id = $1 AND "returnDate" IS NULL
+    `, [rentalId, returnDate, delayFee]);    
+
+    return res.sendStatus(200);
   } catch {
     res.sendStatus(500);
   }
