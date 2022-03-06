@@ -29,6 +29,17 @@ export async function createRental(_req, res) {
 }
 
 export async function getRentals(req, res) {
+  const { customerId, gameId } = req.query;
+  
+  let filter = "";
+  if (customerId) {
+    filter = `WHERE "customerId" = ${customerId}`
+  }
+  if (gameId) {
+    filter = `WHERE "gameId" = ${gameId}`
+    console.log(filter)
+  }
+
   try {
     const rentalsResult = await connection.query(`
       SELECT rentals.*, games.name AS "gameName", games."categoryId" AS "gameCategoryId", categories.name AS "gameCategoryName", customers.name AS "customerName"
@@ -36,33 +47,34 @@ export async function getRentals(req, res) {
         JOIN games ON rentals."gameId" = games.id
           JOIN categories ON games."categoryId" = categories.id
         JOIN customers ON rentals."customerId" = customers.id
+      ${customerId || gameId ? filter : ""}
     `);
 
     const rentals = rentalsResult.rows.map(rental => {
       const rentDate = rental.rentDate.toISOString().split("T")[0];
-      
+
       return ({
-      id: rental.id,
-      customerId: rental.customerId,
-      gameId: rental.gameId,
-      rentDate,
-      daysRented: rental.daysRented,
-      returnDate: rental.returnDate,
-      originalPrice: rental.originalPrice,
-      delayFee: rental.delayFee,
-      customer: {
-        id: rental.customerId,
-        name: rental.customerName
-      },
-      game: {
-        id: rental.gameId,
-        name: rental.gameName
-      }
-    })});
+        id: rental.id,
+        customerId: rental.customerId,
+        gameId: rental.gameId,
+        rentDate,
+        daysRented: rental.daysRented,
+        returnDate: rental.returnDate,
+        originalPrice: rental.originalPrice,
+        delayFee: rental.delayFee,
+        customer: {
+          id: rental.customerId,
+          name: rental.customerName
+        },
+        game: {
+          id: rental.gameId,
+          name: rental.gameName
+        }
+      })
+    });
   
     return res.status(200).send(rentals);
-  } catch (error) {
-    console.log(error)
-    return res.sendStatus(500);
+  } catch {
+    res.sendStatus(500);
   }
 }
