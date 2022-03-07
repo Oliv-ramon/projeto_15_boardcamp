@@ -29,7 +29,9 @@ export function rentalFormatToSend(rental) {
     },
     game: {
       id: rental.gameId,
-      name: rental.gameName
+      name: rental.gameName,
+      categoryId: rental.gameCategoryId,
+      categoryName: rental.gameCategoryName
     }
   })
 }

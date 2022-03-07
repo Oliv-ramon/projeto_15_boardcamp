@@ -45,7 +45,10 @@ export async function getRentals(req, res) {
 
   try {
     const rentalsResult = await connection.query(`
-      SELECT rentals.*, games.name AS "gameName", games."categoryId" AS "gameCategoryId", categories.name AS "gameCategoryName", customers.name AS "customerName"
+      SELECT 
+        rentals.*, games.name AS "gameName", games."categoryId" AS "gameCategoryId", 
+        categories.name AS "gameCategoryName", 
+        customers.name AS "customerName"
       FROM rentals
         JOIN games ON rentals."gameId" = games.id
           JOIN categories ON games."categoryId" = categories.id
@@ -53,7 +56,7 @@ export async function getRentals(req, res) {
       ${filter && filter}
     `);
 
-    const rentals = rentalsResult.rows.filter(rental => {
+    const rentals = rentalsResult.rows.map(rental => {
       if (startDate) {
         const initialDate = new Date(startDate);
         const isValidDate = rental.rentDate.getTime() > initialDate.getTime();
@@ -61,7 +64,7 @@ export async function getRentals(req, res) {
         if (isValidDate) {
           return rentalFormatToSend(rental);
         } else {
-          return
+          return 
         }
       }
 
