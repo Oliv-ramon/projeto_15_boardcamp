@@ -30,7 +30,7 @@ export async function createRental(_req, res) {
 }
 
 export async function getRentals(req, res) {
-  const { customerId, gameId, status } = req.query;
+  const { customerId, gameId, status, startDate } = req.query;
   
   let filter = "";
   if (customerId) {
@@ -50,11 +50,24 @@ export async function getRentals(req, res) {
         JOIN games ON rentals."gameId" = games.id
           JOIN categories ON games."categoryId" = categories.id
         JOIN customers ON rentals."customerId" = customers.id
-      ${customerId || gameId || status ? filter : ""}
+      ${filter && filter}
     `);
 
-    const rentals = rentalsResult.rows.map(rental => rentalFormatToSend(rental));
-  
+    const rentals = rentalsResult.rows.filter(rental => {
+      if (startDate) {
+        const initialDate = new Date(startDate);
+        const isValidDate = rental.rentDate.getTime() > initialDate.getTime();
+
+        if (isValidDate) {
+          return rentalFormatToSend(rental);
+        } else {
+          return
+        }
+      }
+
+      return rentalFormatToSend(rental);
+    });
+    
     return res.status(200).send(rentals);
   } catch (error){
     console.log(error)
