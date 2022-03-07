@@ -1,4 +1,5 @@
 import connection from "../db.js";
+import { rentalFormatToSend } from "../schemas/rentalSchema.js";
 
 export async function createRental(_req, res) {
   const { rental, game } = res.locals;
@@ -49,28 +50,7 @@ export async function getRentals(req, res) {
       ${customerId || gameId ? filter : ""}
     `);
 
-    const rentals = rentalsResult.rows.map(rental => {
-      const rentDate = rental.rentDate.toISOString().split("T")[0];
-
-      return ({
-        id: rental.id,
-        customerId: rental.customerId,
-        gameId: rental.gameId,
-        rentDate,
-        daysRented: rental.daysRented,
-        returnDate: rental.returnDate,
-        originalPrice: rental.originalPrice,
-        delayFee: rental.delayFee,
-        customer: {
-          id: rental.customerId,
-          name: rental.customerName
-        },
-        game: {
-          id: rental.gameId,
-          name: rental.gameName
-        }
-      })
-    });
+    const rentals = rentalsResult.rows.map(rental => rentalFormatToSend(rental));
   
     return res.status(200).send(rentals);
   } catch {
@@ -92,7 +72,8 @@ export async function finishRental(_req, res) {
 
     const { pricePerDay } = gameResult.rows[0];
 
-    const delayDays = parseInt((returnDate.getTime() - rentDate.getTime())/(1000*60*60*24));
+    const oneDayInMiliseconds = 1000*60*60*24;
+    const delayDays = parseInt((returnDate.getTime() - rentDate.getTime())/oneDayInMiliseconds);
     const delayFee = pricePerDay * delayDays;
     
     await connection.query(`
