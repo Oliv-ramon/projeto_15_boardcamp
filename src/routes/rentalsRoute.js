@@ -1,11 +1,12 @@
 import { Router } from "express";
-import { rentalValidation, rentalToFinishValidation } from "../middlewares/index.js"
-import { createRental, getRentals, finishRental } from "../controllers/rentalsController.js";
+import { rentalValidation, rentalToFinishOrDeleteValidation } from "../middlewares/index.js"
+import { createRental, getRentals, finishRental, deleteRental } from "../controllers/rentalsController.js";
 
 const rentalsRoute = Router();
 
-rentalsRoute.post("/rentals", rentalValidation, createRental);
-rentalsRoute.post("/rentals/:id/return", rentalToFinishValidation, finishRental);
 rentalsRoute.get("/rentals", getRentals);
+rentalsRoute.post("/rentals", rentalValidation, createRental);
+rentalsRoute.post("/rentals/:id/return", rentalToFinishOrDeleteValidation, finishRental);
+rentalsRoute.delete("/rentals/:id", rentalToFinishOrDeleteValidation, deleteRental);
 
 export default rentalsRoute;

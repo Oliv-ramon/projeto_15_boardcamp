@@ -1,17 +1,18 @@
 import connection from "../db.js";
 
-export default async function rentalToFinishValidation (req, res, next) {
+export default async function rentalToFinishOrDeleteValidation (req, res, next) {
   const rentalId = req.params.id;
 
   try {
     const rentalResult = await connection.query(`
     SELECT * FROM rentals
-      WHERE id = $1 AND "returnDate" IS NULL
+      WHERE id = $1
   `, [rentalId]);
 
     const [rental] = rentalResult.rows;
 
     if (!rental) {
+      console.log(rental)
       return res.status(404).send("rental unexist")
     }
 
