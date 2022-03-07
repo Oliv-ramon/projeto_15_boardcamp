@@ -33,13 +33,26 @@ export async function updateCustomer(req, res) {
   }
 }  
 
-export async function getCustomers(_req, res) {
+export async function getCustomers(req, res) {
+  const { cpf } = req.query;
+  
+  let filter = "";
+  if (cpf) {
+    filter = `WHERE cpf ILIKE '${cpf}%'`;
+  }
+
+
   try {
     const query =  await connection.query(`
-      SELECT * FROM customers`);
+      SELECT * FROM customers
+      ${filter && filter}
+      `);
 
-    const customers = query.rows;
-    
+    const customers = query.rows.map(customer => {
+      customer.birthday = customer.birthday.toISOString().split("T")[0];
+      return customer;
+    });
+
     return res.status(200).send(customers);
   } catch {
     res.sendStatus(500);

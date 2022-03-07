@@ -7,7 +7,9 @@ export async function createGame(req, res) {
 
   try {
     await connection.query(`
-      INSERT INTO games (name, image, "stockTotal", "categoryId", "pricePerDay") VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO games 
+        (name, image, "stockTotal", "categoryId", "pricePerDay") 
+      VALUES ($1, $2, $3, $4, $5)
     `, Object.values(game));
     
     return res.sendStatus(201);
@@ -16,15 +18,25 @@ export async function createGame(req, res) {
   }
 }   
 
-export async function getGames(_req, res) {
+export async function getGames(req, res) {
+  const { name } = req.query;
+  
+  let filter = "";
+  if (name) {
+    filter = `WHERE name ILIKE '${name}%'`;
+  }
+
   try {
     const query =  await connection.query(`
-      SELECT * FROM games`);
+      SELECT * FROM games
+      ${filter && filter}
+    `);
 
     const games = query.rows;
     
     return res.status(200).send(games);
-  } catch {
+  } catch (error){
+    console.log(error)
     res.sendStatus(500);
   }
 }
